@@ -871,12 +871,12 @@ class Widget extends Base {
 
     async checkUpdate() {
         try {
-            let req = new Request(encodeURI('https://cdn.jsdelivr.net/gh/owyr/bmw-widget@latest/version.json'));
+            let req = new Request(encodeURI('https://cdn.jsdelivr.net/gh/owyr/bmw-widget@main/version.json'));
             let res = await req.loadJSON();
             let {updateVersion, updateLog, updateUrl} = res
             if (Number(updateVersion) > Number(WIDGET_VERSION)) {
                 // this.notify('宝马小组件检查到有更新', '请打开Scriptable点击宝马小组件检查更新并下载');
-                await this.downloadUpdate(updateVersion, updateLog, updateUrl || "https://cdn.jsdelivr.net/gh/owyr/bmw-widget@latest/bmw-widget.js")
+                await this.downloadUpdate(updateVersion, updateLog, updateUrl || "https://cdn.jsdelivr.net/gh/owyr/bmw-widget@main/bmw-widget.js")
                 // return res; 
             } else {
                 // return res; 
