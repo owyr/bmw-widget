@@ -1,7 +1,7 @@
 // Variables used by Scriptable.
 // These must be at the very top of the file. Do not edit.
 // icon-color: pink; icon-glyph: car;
-let WIDGET_VERSION = '20230831';
+let WIDGET_VERSION = '20230830';
 let BMW_VERSION = '3.8.0';
 
 let WIDGET_FONT = 'SF UI Display';
@@ -873,46 +873,48 @@ class Widget extends Base {
         try {
             let req = new Request(encodeURI('https://cdn.jsdelivr.net/gh/owyr/bmw-widget@main/version.json'));
             let res = await req.loadJSON();
-            let {updateVersion, updateLog, updateUrl} = res
-            if (Number(updateVersion) > Number(WIDGET_VERSION)) {
+            let Version = res.updateVersion
+            let VersionLog = res.updateLog
+            if (Number(Version) > Number(WIDGET_VERSION)) {
                 // this.notify('宝马小组件检查到有更新', '请打开Scriptable点击宝马小组件检查更新并下载');
-                await this.downloadUpdate(updateVersion, updateLog, updateUrl || "https://cdn.jsdelivr.net/gh/owyr/bmw-widget@main/bmw-widget.js")
-                // return res; 
+                await this.downloadUpdate(Version, VersionLog)
+                return {Up: true, Version: Version, VersionLog: VersionLog}; 
             } else {
-                // return res; 
+                return {Up: false, Version: Version, VersionLog: VersionLog}; 
             }
         } catch (e) {
             console.error('宝马小组件检测更新失败: ' + e.message);
         }
     }
 
-    async downloadUpdate(updateVersion, updateLog, updateUrl) {
+    async downloadUpdate(Version, VersionLog) {
         try {
             let N = "宝马小组件";
             let F = FileManager[module.filename.includes("Documents/iCloud~")?"iCloud":"local"]();
-            F.write(F.joinPath(F.documentsDirectory(),`${N}.js`),await new Request(encodeURI(`${updateUrl}`)).load());
+            F.write(F.joinPath(F.documentsDirectory(),`${N}.js`),await new Request(encodeURI(`https://cdn.jsdelivr.net/gh/owyr/bmw-widget@main/bmw-widget.js`)).load());
             Safari.open("scriptable:///run?scriptName=");
-            this.notify(`宝马小组件已更新-${updateVersion}`, updateLog);
+            this.notify(`宝马小组件已更新-${Version}`, VersionLog);
         } catch (e) {
-            console.error('宝马小组件更新失败: ' + e.message);
+            console.error('宝马小组件更新失败: ' + e);
         }
     }
 
     async checkUpdatePress() {
-        let res = await this.checkUpdate();
-        let {updateVersion, updateLog, updateUrl} = res
-
+        let Update = await this.checkUpdate();
+        let Up = Update.Up
+        let Version = Update.Version
+        let VersionLog = Update.VersionLog
         const updateAlert = new Alert();
-        if (updateVersion) {
+        if (Up) {
             updateAlert.title = '找到更新';
-            updateAlert.message = `版本号：${updateVersion}\n`;
-            updateAlert.message += updateLog;
+            updateAlert.message = `版本号：${Version}\n`;
+            updateAlert.message += VersionLog;
             updateAlert.message += '\n\r\n是否开始更新?';
             updateAlert.addAction('开始更新');
         } else {
             updateAlert.title = '暂无更新';
-            updateAlert.message = `版本号：${updateVersion}\n`;
-            updateAlert.message += updateLog;
+            updateAlert.message = `版本号：${Version}\n`;
+            updateAlert.message += VersionLog;
             updateAlert.message += '\n\r\n但您可重新安装小组件，是否重新安装?';
             updateAlert.addAction('重新安装');
         }
@@ -923,7 +925,7 @@ class Widget extends Base {
             return;
         }
 
-        await this.downloadUpdate(updateVersion, updateLog, updateUrl)
+        await this.downloadUpdate(Version, VersionLog)
     }
 
     async userConfigInput() {
