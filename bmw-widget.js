@@ -1,7 +1,7 @@
 // Variables used by Scriptable.
 // These must be at the very top of the file. Do not edit.
 // icon-color: pink; icon-glyph: car;
-let WIDGET_VERSION = '20230830';
+let WIDGET_VERSION = '20230831';
 let BMW_VERSION = '3.8.0';
 
 let WIDGET_FONT = 'SF UI Display';
